@@ -3,7 +3,8 @@
 %% API
 -export([
   demo1/0,
-  demo2/0
+  demo2/0,
+  demo3/0
 ]).
 
 demo1() ->
@@ -12,13 +13,18 @@ demo1() ->
 demo2() ->
   [{I, (catch generate_exception(I))} || I <- [1,2,3,4,5]].
 
+demo3() ->
+  catcher(5).
+
 catcher(N) ->
     try generate_exception(N) of
       Val -> {N, normal, Val}
     catch
       throw:X -> {N, caught, thrown, X};
       exit:X  -> {N, caught, exited, X};
-      error:X -> {N, caught, error, X}
+      error:X ->
+        erlang:display(erlang:get_stacktrace()),
+        {N, caught, error, X}
     end.
 
 generate_exception(1) -> a;
